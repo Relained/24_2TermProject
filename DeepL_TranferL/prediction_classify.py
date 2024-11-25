@@ -7,8 +7,8 @@ from torchvision import transforms, datasets
 from torchvision.models import resnet50, ResNet50_Weights
 from torch.utils.data import DataLoader, random_split
 from functions.fc import load_config_json
-from functions.db import insert_image
 from DeepL_TranferL.make_model import CustomDataset
+from functions.db import insert_image
 
 
 
