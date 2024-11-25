@@ -1,10 +1,11 @@
 import os
 import mariadb
 from contextlib import contextmanager
-from functions.fc import create_mapping_and_class_count, load_config_json
+from functions.fc import load_config_json
+from DeepL_TranferL.make_model import CustomDataset
 
 paths, database, _ = load_config_json(os.getcwd())
-mapping_table, _ = create_mapping_and_class_count(paths["dataset_dir"])
+Dataset = CustomDataset(paths["dataset_dir"])
 database_name = database["name"]
 
 # DB 연결
@@ -179,44 +180,42 @@ def create_tables(connection):
     except mariadb.Error as e:
         print(f"Error Occurred: {e}")
 
-# mapping_table을 바탕으로 class 테이블에 클래스 구조를 insert
-def insert_class(connection):
+# CustomDataset 객체를 바탕으로 class 테이블에 클래스 구조를 insert
+def insert_class_from_dataset(connection, dataset=Dataset):
+    """
+    train_dataset을 기반으로 데이터베이스에 클래스 구조를 삽입합니다.
+
+    Args:
+        connection: 데이터베이스 연결 객체.
+        dataset: CustomDataset 객체, 클래스 이름과 ID 정보를 포함.
+    """
     try:
+        # 데이터베이스 트랜잭션 및 커서 사용
         with transaction(connection), get_cursor(connection) as cursor:
             print(f"Using DB '{database_name}'")
-            tree = mapping_tree(mapping_table)
 
-            # 트리 구조를 순회하여 데이터베이스에 삽입하는 함수
-            def insert_tree(cursor, tree, p_id=None):
-                for node_name, children in tree.items():
-                    # 중복 확인
-                    if record_exists(cursor, "class", {"name": node_name, "p_id": p_id}):
-                        print(f"Skipped (already exists): {node_name} (Parent ID: {p_id})")
-                        # 중복된 경우, 해당 노드의 ID를 가져와서 자식 노드 처리
-                        cursor.execute("""
-                        SELECT id FROM class WHERE name = %s AND p_id = %s
-                        """, (node_name, p_id))
-                        class_id = cursor.fetchone()[0]
-                    else:
-                        # 중복되지 않은 경우 삽입
-                        cursor.execute("""
+            # class_to_name 매핑을 사용하여 클래스 삽입
+            for class_id, class_name in dataset.class_to_name.items():
+                # 부모 ID는 없으므로 기본 None
+                p_id = None
+
+                # 중복 확인
+                if record_exists(cursor, "class", {"name": class_name, "p_id": p_id}):
+                    print(f"Skipped (already exists): {class_name} (Parent ID: {p_id})")
+                else:
+                    # 중복되지 않은 경우 삽입
+                    cursor.execute("""
                         INSERT INTO class (name, p_id)
                         VALUES (%s, %s);
-                        """, (node_name, p_id))
-                        class_id = cursor.lastrowid
-                        print(f"Inserted: {node_name} (Parent ID: {p_id})")
+                    """, (class_name, p_id))
+                    print(f"Inserted: {class_name} (Parent ID: {p_id})")
 
-                    # 하위 노드 처리
-                    if isinstance(children, dict) and children:
-                        insert_tree(cursor, children, class_id)
-
-            insert_tree(cursor, tree)
         print("Class structure successfully inserted.")
         return True
-
-    except mariadb.Error as e:
-        print(f"Error occurred: {e}")
+    except Exception as e:
+        print(f"Error inserting class structure: {e}")
         return False
+
 
 # class 객체 read
 def read_class(connection, class_id=None, p_id=None):

@@ -1,30 +1,18 @@
 import os
-from functions import fc
-from functions import db
-import mariadb
+from functions.fc import load_config_json
+from DeepL_TranferL.make_model import make_model
+from DeepL_TranferL.prediction_classify import classify_image, evaluate_model
 
-base_dir = os.getcwd()
-fc.create_config_json(base_dir, database={
-        "name": "noDG",
-        "model_name": "my_trained_model.h5",
-        "user": "root",
-        "password": "52455245klakla@",
-        "host": "localhost",
-        "port": 3306
-    })
-paths, database, _= fc.load_config_json(base_dir)
+paths, database, allowed_ext = load_config_json(os.getcwd())
 
-for _, path in paths.items():
-    os.makedirs(path, exist_ok=True)
-    print(f"Directory {path} created")
+for root, _, files in os.walk(paths["unclassified_dir"]):
+    for file in files:
+        if os.path.splitext(file)[1].lower() in allowed_ext:
+            img_path = os.path.join(root, file)
+            print(f"Processing {img_path}")
+            try:
+                classify_image(img_path)
+            except Exception as e:
+                print(f"Error processing {img_path}: {e}")
 
-connection = mariadb.connect(user = database["user"],
-                             password = database["password"],
-                             host = database["host"],
-                             port = database["port"]
-                             )
-
-
-print("""\nSetup Done!, put image for model input to *path*/storage/dataset (with appropriate folder tree)
-Then, do make_model for making your custom layered image model!
-or, you can choose your custom directory by changing config.json""")
+# evaluate_model()

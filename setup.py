@@ -1,11 +1,11 @@
 import os
 from functions import fc
-from functions import db
+# from functions import db
 
 base_dir = os.getcwd()
 fc.create_config_json(base_dir, database={
         "name": "noDG",
-        "model_name": "my_trained_model.h5",
+        "model_name": "my_trained_model.pth",
         "user": "root",
         "password": "<PASSWORD>", # change to your password
         "host": "localhost",
@@ -17,10 +17,10 @@ for _, path in paths.items():
     os.makedirs(path, exist_ok=True)
     print(f"Directory {path} created")
 
-connection = db.connect_mariadb(database["user"], database["password"], database["host"], database["port"])
-db.create_db(connection)
-db.create_tables(connection)
-connection.close()
+# connection = db.connect_mariadb(database["user"], database["password"], database["host"], database["port"])
+# db.create_db(connection)
+# db.create_tables(connection)
+# connection.close()
 
 print("""\nSetup Done!, put image for model input to *path*/storage/dataset (with appropriate folder tree)
 Then, do make_model for making your custom layered image model!
