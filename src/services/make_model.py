@@ -3,10 +3,10 @@ from PIL import Image, ImageFile
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torchvision import datasets, transforms
+from torchvision import transforms
 from torchvision.models import resnet50, ResNet50_Weights
 from torch.utils.data import DataLoader, Dataset
-from functions.fc import load_config_json
+from src.utils.fc import load_config_json
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="PIL.Image")
 ImageFile.LOAD_TRUNCATED_IMAGES = True

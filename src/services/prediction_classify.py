@@ -6,11 +6,8 @@ import torch.nn as nn
 from torchvision import transforms, datasets
 from torchvision.models import resnet50, ResNet50_Weights
 from torch.utils.data import DataLoader, random_split
-from functions.fc import load_config_json
-from DeepL_TranferL.make_model import CustomDataset
-from functions.db import insert_image
-
-
+from src.utils.fc import load_config_json
+from src.services.make_model import CustomDataset
 
 # 설정 로드
 paths, database, _ = load_config_json(os.getcwd())

@@ -1,5 +1,6 @@
 import os
-from functions import fc
+from src.utils import fc
+
 # from functions import db
 
 base_dir = os.getcwd()

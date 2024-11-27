@@ -1,8 +1,8 @@
 import os
 import mariadb
 from contextlib import contextmanager
-from functions.fc import load_config_json
-from DeepL_TranferL.make_model import CustomDataset
+from src.utils.fc import load_config_json
+from src.services.make_model import CustomDataset
 
 paths, database, _ = load_config_json(os.getcwd())
 Dataset = CustomDataset(paths["dataset_dir"])

@@ -1,7 +1,6 @@
 import os
-from functions.fc import load_config_json
-from DeepL_TranferL.make_model import make_model
-from DeepL_TranferL.prediction_classify import classify_image, evaluate_model
+from src.utils.fc import load_config_json
+from src.services.prediction_classify import classify_image
 
 paths, database, allowed_ext = load_config_json(os.getcwd())
 

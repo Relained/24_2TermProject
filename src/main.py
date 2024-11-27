@@ -1,6 +1,5 @@
 import os
-import functions.db as db
-import functions.fc as fc
+import src.utils.fc as fc
 
 base_dir = os.getcwd()
 paths, database, allowed_ext = fc.load_config_json(base_dir)
