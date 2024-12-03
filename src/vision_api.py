@@ -1,5 +1,5 @@
 from google.cloud import vision
-from fc import open_image_binary
+from utils import open_image_binary
 
 
 client = vision.ImageAnnotatorClient()
