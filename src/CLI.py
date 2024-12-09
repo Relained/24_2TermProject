@@ -10,7 +10,7 @@ def main():
         description="""auto-classify-images CLI
 This program is for auto-classifying images in a folder using the trained model
 
-Follow this simple steps:
+Follow these simple steps:
     1. Set your path to the project folder or elsewhere. (It will be your storage for images, config, and model)
     2. Put your initially classified images (at least 100 images for each folder in /dataset)
     3. Train the model by running the train command (it will take some time, so be patient)
