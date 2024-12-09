@@ -57,8 +57,8 @@ NoDFPT는 Not a Default Photos의 약자로,
   `ResNet50`의 기본 가중치를 기반으로 전이 학습을 수행합니다.  
   출력 레이어를 `dataset` 디렉토리의 클래스로 지정하여 학습합니다.
   `state_dict` 모델로 `storage`에 저장되며, loss와 acc를 시각화한 그래프를 함께 저장합니다.  
-  기본 `epoch`는 5회이며, 사용자 지정 횟수로 모델을 학습할 수 있습니다.
-<img src="">
+  기본 `epoch`는 5회이며, 사용자 지정 횟수로 모델을 학습할 수 있습니다.  
+<img src="sample/_loss.png" width="600"><img src="sample/_accuracy.png" width="600">
   
 
 - **classify**
