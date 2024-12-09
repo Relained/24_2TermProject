@@ -20,7 +20,7 @@ def create_config_json(path=None, database_setting=None):
         "database_setting": database_setting if database_setting is not None else default_database_setting,
     }
 
-    config_file_path = os.path.join(path if path is not None else default_path, 'config.json')
+    config_file_path = os.path.join(default_path, 'config.json')
 
     with open(config_file_path, "w", encoding="utf-8") as file:
         json.dump(config_data, file, indent=4, ensure_ascii=False)
@@ -71,10 +71,10 @@ def validate_image(image_path):
 # 변환된 파일들의 경로 리스트를 반환
 def convert_images(folder_dir):
     converted_files = []
-    valid_extensions = {'.gif', '.webp'}
+    check_extensions = {'.gif', '.webp'}
 
     for root, dirs, files in os.walk(folder_dir):
-        filtered_files = [f for f in files if os.path.splitext(f)[1].lower() in valid_extensions]
+        filtered_files = [f for f in files if os.path.splitext(f)[1].lower() in check_extensions]
 
         for file in filtered_files:
             file_path = os.path.join(root, file)

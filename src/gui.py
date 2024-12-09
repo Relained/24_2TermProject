@@ -52,6 +52,7 @@ class MainWindow(QGraphicsView):
 
 
 
+
 # 좌측 사이드바
 class sideBar(QWidget):
     def __init__(self):

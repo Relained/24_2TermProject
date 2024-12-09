@@ -17,7 +17,6 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # 설정 및 데이터 경로 로드
 path, _ = load_config_json()
-processed_dataset_dir = os.path.join(path, "storage/processed")  # 변환된 이미지 저장 경로
 dataset_dir = os.path.join(path, "storage/dataset")
 classified_dir = os.path.join(path, "storage/classified")
 
@@ -71,10 +70,14 @@ data_transforms = {
     ]),
 }
 
-# 사용자 정의 데이터셋 로드
-train_dataset = CustomDataset(dataset_dir, transform=data_transforms['train'])
-val_dataset = CustomDataset(dataset_dir, transform=data_transforms['val'])
-class_count = len(train_dataset.class_to_name)  # 클래스 개수 계산
+# 데이터셋을 학습과 검증으로 나누기
+full_dataset = CustomDataset(dataset_dir, transform=data_transforms['train'])
+train_size = int(0.8 * len(full_dataset))  # 80%를 학습 데이터로 사용
+val_size = len(full_dataset) - train_size  # 나머지를 검증 데이터로 사용
+train_dataset, val_dataset = torch.utils.data.random_split(full_dataset, [train_size, val_size])
+
+# 클래스 개수 계산
+class_count = len(full_dataset.class_to_name)
 
 dataloaders = {
     'train': DataLoader(train_dataset, batch_size=32, shuffle=True),
@@ -140,6 +143,7 @@ def preprocess_image(img_path, device):
         if img_path.lower().endswith(".gif"):
             with Image.open(img_path) as img:
                 img.seek(0)  # 첫 번째 프레임 읽기
+                img = img.convert("RGB")  # RGB로 변환
 
         elif img_path.lower().endswith(".webp"):
             with Image.open(img_path) as img:
@@ -164,10 +168,22 @@ def preprocess_image(img_path, device):
         print(e)
         return None
 
-def make_model():
+def make_model(num_epochs=5):
     # 변환 함수 실행 (변환된 파일 리스트 반환)
     print("Converting images...")
     copied_img = convert_images(dataset_dir)
+
+    # 변환된 이미지 경로로 데이터셋 다시 로드
+    full_dataset = CustomDataset(dataset_dir, transform=data_transforms['train'])
+    train_size = int(0.8 * len(full_dataset))  # 80%를 학습 데이터로 사용
+    val_size = len(full_dataset) - train_size  # 나머지를 검증 데이터로 사용
+    train_dataset, val_dataset = torch.utils.data.random_split(full_dataset, [train_size, val_size])
+    
+    dataloaders = {
+        'train': DataLoader(train_dataset, batch_size=32, shuffle=True),
+        'val': DataLoader(val_dataset, batch_size=32, shuffle=False)
+    }
+    print(f"Dataset loaded successfully. {len(train_dataset)} images for training, {len(val_dataset)} images for validation.")
 
     # 사용할 장치 선택
     device = select_device()
@@ -178,7 +194,6 @@ def make_model():
     optimizer = optim.Adam(device_model.parameters(), lr=0.0001)
 
     # 학습 루프
-    num_epochs = 10
     history = {"train_loss": [], "train_acc": [], "val_loss": [], "val_acc": []}
 
     for epoch in range(num_epochs):
@@ -222,7 +237,7 @@ def make_model():
 
             print(f"{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}")
 
-    # 학습 진행 시각화
+    # 학습 진행 시각화 및 저장
     plot_training_history(history)
 
     # 학습 완료된 모델 저장
@@ -268,7 +283,7 @@ def classify_image(device_model, img_path):
         img_name = os.path.basename(img_path)
 
         # 클래스 레이블 가져오기 (폴더 이름 매핑)
-        class_label = train_dataset.class_to_name.get(predicted_class, f"class_{predicted_class}")
+        class_label = full_dataset.class_to_name.get(predicted_class, f"class_{predicted_class}")
 
         # 예측된 폴더로 이미지 이동
         dest_dir = os.path.join(classified_dir, class_label)
@@ -293,3 +308,5 @@ def classify_from_folder(device_model, folder_path):
 
     for img_path in image_paths:
         classify_image(device_model, img_path)
+
+    print("Classification complete.")

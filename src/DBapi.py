@@ -5,7 +5,7 @@ from src.utils import load_config_json
 from src.model import CustomDataset
 
 paths, database, _ = load_config_json(os.getcwd())
-Dataset = CustomDataset(paths["dataset_dir"])
+Dataset = CustomDataset(os.path.join(paths, "storage/dataset"))
 database_name = database["name"]
 
 # DB 연결
@@ -627,7 +627,7 @@ def insert_annotation(connection, image_id, x1, y1, x2, y2, label):
         with transaction(connection), get_cursor(connection) as cursor:
             print(f"Using DB '{database_name}'")
 
-            if not record_exists(cursor, image, {"id" : image_id}):
+            if not record_exists(cursor, "image", {"id" : image_id}):
                 print(f"Image with ID {image_id} does not exist.")
                 return None
 

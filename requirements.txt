@@ -1,0 +1,7 @@
+PySide6~=6.8.0.2
+mariadb~=1.1.11
+torch~=2.5.1+cu124
+torchvision~=0.20.1+cu124
+matplotlib~=3.9.2
+pillow~=11.0.0
+protobuf~=5.28.3
