@@ -13,7 +13,7 @@ NoDFPT는 Not a Default Photos의 약자로,
 ## How to install
 1. 프로젝트를 클론 또는 다운로드 합니다.
 2. 필요한 패키지를 설치합니다:  
-  **GPU 사용시 CUDA, cuDNN등의 설정이 필요합니다!! (requirements.txt 확인)**
+  **GPU 사용시 CUDA, cuDNN등의 설정이 필요합니다!! (requirements.txt 확인요망)**
    
       ```
       pip install -r requirements.txt
